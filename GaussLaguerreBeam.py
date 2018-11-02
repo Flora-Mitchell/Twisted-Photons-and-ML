@@ -15,10 +15,11 @@ l = 4
 psi = (numpy.absolute(l) + 2*p + 1)*numpy.arctan(z/z0)
 
 
-Alp = numpy.sqrt((2*scipy.special.factorial(p))/(numpy.pi*scipy.special.factorial(p+numpy.absolute(l))))
-LG = scipy.special.genlaguerre(p, l)
-
 def LaguerreGauss(x, y):
+    
+    Alp = numpy.sqrt((2*scipy.special.factorial(p))/(numpy.pi*scipy.special.factorial(p+numpy.absolute(l))))
+    LG = scipy.special.genlaguerre(p, l)
+    
     r = numpy.sqrt(x**2 + y**2)
     phi = numpy.arctan2(y, x)
     rho = r/wz
