@@ -11,39 +11,32 @@ z = 200
 wz = w0*numpy.sqrt(1 + (z/z0)**2)
 Rz = z * (1 + (z0/z)**2)
 p = 0
-l = 4
+l = 8
 psi = (numpy.absolute(l) + 2*p + 1)*numpy.arctan(z/z0)
 
-
-def LaguerreGauss(x, y):
-    
-    Alp = numpy.sqrt((2*scipy.special.factorial(p))/(numpy.pi*scipy.special.factorial(p+numpy.absolute(l))))
-    LG = scipy.special.genlaguerre(p, l)
-    
+def Cart2Polar(x, y):
     r = numpy.sqrt(x**2 + y**2)
     phi = numpy.arctan2(y, x)
+    return r, phi
+    
+def LaguerreGauss(r, phi):
+    Alp = numpy.sqrt((2*scipy.special.factorial(p))/(numpy.pi*scipy.special.factorial(p+numpy.absolute(l))))
+    LG = scipy.special.genlaguerre(p, l)
     rho = r/wz
-    
-    p1 = Alp/wz
-    p2 = ((rho)*numpy.sqrt(2))**numpy.absolute(l)
-    p3 = (LG(2 * rho**2))
-    p4 = numpy.exp(-1* rho**2)
-    p5 = numpy.exp(-1j*k*(r**2/(2*Rz)))
-    p7 = numpy.exp(-1j*k*z)
-    p8 = numpy.exp(1j*psi)
-    
-    R = p1 * p2 * p3 * p4 * p5 * p7 * p8
-    #return R * numpy.conj(R) * 2 * (1 + numpy.cos(2 * l * phi))
+    Im = Alp/wz * ((rho)*numpy.sqrt(2))**numpy.absolute(l) * (LG(2 * rho**2))
+    Re = numpy.exp(-1* rho**2) * numpy.exp(-1j*k*(r**2/(2*Rz))) * numpy.exp(-1j*k*z) * numpy.exp(1j*psi)
+    R = Im * Re
     return R * (numpy.exp(1j * l * phi) + numpy.exp(-1j * l * phi))
-        
+    
+def IntensityProfile(x, y):
+    r, phi = Cart2Polar(x, y)
+    E = LaguerreGauss(r, phi)
+    return (E * numpy.conj(E)).real     
+                        
 x = numpy.arange(-0.2, 0.2, 0.0008)
 y = numpy.copy(x)
 xx, yy = numpy.meshgrid(x, y)
 
-
-
-Z = LaguerreGauss(xx, yy)
-
-Intensity = (Z * numpy.conj(Z)).real
+Intensity = IntensityProfile(xx, yy)
 pyplot.imshow(Intensity,cmap=pyplot.cm.gray)
 pyplot.show()
